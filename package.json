@@ -1,16 +1,13 @@
 {
-  "name": "az-dev-base",
-  "version": "1.0.0",
-  "description": "A general purpose seed project base",
-  "main": "dist/library/index.js",
+  "name": "ricio",
+  "version": "0.1.0",
+  "description": "Ricio",
+  "main": "index.js",
   "repository": {
     "type": "git"
   },
   "keywords": [
     "gulp",
-    "seed",
-    "boilerplate",
-    "kickstarter",
     "ES6",
     "6to5"
   ],
@@ -34,6 +31,7 @@
     "@babel/preset-env": "^7.4.3",
     "@babel/preset-typescript": "^7.3.3",
     "@babel/register": "^7.4.0",
+    "axios": "^0.17.1",
     "az-gulp-env-lite": "git+https://github.com/xtforgame/az-gulp-env-lite.git#v2.0.0-alpha.1",
     "babel-eslint": "^8.2.6",
     "babel-plugin-module-resolver": "^3.1.1",
@@ -50,7 +48,8 @@
     "sinon": "^4.3.0",
     "tslint": "^5.16.0",
     "tslint-config-airbnb": "^5.11.1",
-    "typescript": "^3.4.4"
+    "typescript": "^3.4.4",
+    "ws": "^4.1.0"
   },
   "false": {}
 }
