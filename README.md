@@ -1,6 +1,6 @@
-# AzDevBase
+# Ricio
 
-A general purpose seed project base
+Ricio
 
 Run `npm install`
 
