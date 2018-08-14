@@ -20,15 +20,15 @@ function createContext(server, ws, rcPeer, { peerInfo: _peerInfo = {}, rawData, 
 
   msg.rcPeer = rcPeer;
   msg.rcResponse = msg.rcPeer.response || msg.genResponse({
-    send: (data, options = {}) => {
+    send: (data) => {
       return new Promise((resolve, reject) => {
         const cb = (error) => {
           if (error) {
-            reject(error);
+            return reject(error);
           }
           resolve(null);
         };
-        ws.send(data, options, cb);
+        ws.send(data, cb);
       });
     },
   });

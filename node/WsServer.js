@@ -51,16 +51,14 @@ function createContext(server, ws, rcPeer, _ref) {
   msg.rcPeer = rcPeer;
   msg.rcResponse = msg.rcPeer.response || msg.genResponse({
     send: function send(data) {
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
       return new Promise(function (resolve, reject) {
         var cb = function cb(error) {
           if (error) {
-            reject(error);
+            return reject(error);
           }
           resolve(null);
         };
-        ws.send(data, options, cb);
+        ws.send(data, cb);
       });
     }
   });
