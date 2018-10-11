@@ -12,8 +12,13 @@ class WsProtocolApi extends ApiBase {
     return new Promise((resolve, reject) => {
       this.wsPeer.send(msg.build(), (error) => {
         if (error) {
-          this.wsPeer.emit('error', error);
-          this.wsPeer.close(1005, 'Unable to send data');
+          try {
+            this.wsPeer.emit('error', error);
+            // this.wsPeer.close(1005, 'Unable to send data'); // the `ws` pcakage treat 1005 as an invalid code for input
+            this.wsPeer.close(3005, 'Unable to send data');
+          } catch (error) {
+            return reject(error);
+          }
           return reject(error);
         }
         return resolve();

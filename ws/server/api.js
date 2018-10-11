@@ -44,8 +44,13 @@ var WsProtocolApi = function (_ApiBase) {
       return new Promise(function (resolve, reject) {
         _this2.wsPeer.send(msg.build(), function (error) {
           if (error) {
-            _this2.wsPeer.emit('error', error);
-            _this2.wsPeer.close(1005, 'Unable to send data');
+            try {
+              _this2.wsPeer.emit('error', error);
+
+              _this2.wsPeer.close(3005, 'Unable to send data');
+            } catch (error) {
+              return reject(error);
+            }
             return reject(error);
           }
           return resolve();
