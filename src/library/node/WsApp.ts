@@ -1,14 +1,16 @@
 export default class WsApp {
-  constructor(){
+  middlewares : any[];
+
+  constructor() {
     this.middlewares = [];
   }
 
-  use(middleware){
+  use(middleware : any) {
     this.middlewares.push(middleware);
   }
 
-  _run(ctx, index = 0){
-    if(index >= this.middlewares.length){
+  _run(ctx : any, index = 0) {
+    if (index >= this.middlewares.length) {
       return Promise.resolve(null);
     }
     return Promise.resolve()
@@ -20,7 +22,7 @@ export default class WsApp {
     });
   }
 
-  callback = () => (ctx) => {
+  callback = () => (ctx : any) => {
     return this._run(ctx);
   }
 }

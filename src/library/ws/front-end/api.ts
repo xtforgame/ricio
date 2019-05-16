@@ -1,9 +1,46 @@
 import ApiBase from '../api-base';
-import { AzWsMessage } from '../../ws';
-import makeCancelable from '../../utils/makeCancelable';
+import { AzWsMessage, AzWsMsgBody, RawData, WsMessageConfig } from '../../ws/index';
+import makeCancelable, { ICancelToken } from '../../utils/makeCancelable';
+
+declare function setInterval(handler: TimerHandler, timeout?: number, ...arguments: any[]): number;
+declare function setTimeout(handler: TimerHandler, timeout?: number, ...arguments: any[]): number;
+
+export interface IEventEmitter {
+  addListener(event: string, listener: Function): IEventEmitter;
+  on(event: string, listener: Function): IEventEmitter;
+  once(event: string, listener: Function): IEventEmitter;
+  removeListener(event: string, listener: Function): IEventEmitter;
+  removeAllListeners(event?: string): IEventEmitter;
+  setMaxListeners(n: number): void;
+  listeners(event: string): Function[];
+  emit(event: string, ...args: any[]): boolean;
+}
+
+export interface IEventEmitterClass {
+  new (...args : any[]): IEventEmitter;
+}
+
+interface PromiseInfo {
+  promise: Promise<any> | null;
+  isFulfilled? : boolean;
+  resolve? : ((arg: any) => any);
+  reject? : ((arg: any) => any);
+}
+
+interface OpenAsyncInfo extends PromiseInfo {
+}
 
 export class WebsocketApi {
-  constructor(url = '', EventEmitter) {
+  url : string;
+  EventEmitter : IEventEmitterClass;
+  socket : WebSocket | null;
+  state : string;
+  nativeEvents : IEventEmitter;
+  binaryType : BinaryType;
+
+  openAsyncInfo : OpenAsyncInfo;
+
+  constructor(url = '', EventEmitter : IEventEmitterClass) {
     this.url = url;
     this.EventEmitter = EventEmitter;
     this.socket = null;
@@ -13,8 +50,8 @@ export class WebsocketApi {
     this.openAsyncInfo = { promise: null };
   }
 
-  close(code, reason) {
-    if(this.socket){
+  close(code? : number, reason? : string) : Promise<any> {
+    if (this.socket) {
       this.openAsyncInfo = { promise: null };
       try {
         this.socket.close(code, reason);
@@ -27,9 +64,9 @@ export class WebsocketApi {
     return Promise.resolve();
   }
 
-  open(url) {
+  open(url? : string) : Promise<any> {
     if ((!url || this.url === url) && this.state !== 'closed') {
-      return this.openAsyncInfo.promise;
+      return this.openAsyncInfo.promise || Promise.resolve();
     }
     this.close();
     this.state = 'connecting';
@@ -46,8 +83,8 @@ export class WebsocketApi {
       this.nativeEvents.emit('open', evt, this);
       if (!this.openAsyncInfo.isFulfilled) {
         this.openAsyncInfo.isFulfilled = true;
-        const { resolve } = this.openAsyncInfo;
-        resolve({ ws: this, evt });
+        const { resolve = () => {} } = this.openAsyncInfo;
+        resolve({ evt, ws: this });
       }
     };
     this.socket.onclose = (evt) => {
@@ -68,8 +105,8 @@ export class WebsocketApi {
       this.nativeEvents.emit('error', evt, this);
       if (!this.openAsyncInfo.isFulfilled) {
         this.openAsyncInfo.isFulfilled = true;
-        const { reject } = this.openAsyncInfo;
-        reject({ ws: this, evt });
+        const { reject = () => {} } = this.openAsyncInfo;
+        reject({ evt, ws: this });
       }
     };
 
@@ -79,33 +116,57 @@ export class WebsocketApi {
     return this.openAsyncInfo.promise;
   }
 
-  send(msg) {
-    if(!this.socket){
+  send(msg :  string | ArrayBufferLike | Blob | ArrayBufferView) {
+    if (!this.socket) {
       return Promise.reject(new Error('No Connection'));
     }
     this.socket.send(msg);
     return Promise.resolve();
   }
 
-  listenNative(events, cb) {
+  listenNative(events : string | { [s : string] : Function }, cb? : Function) {
     if (typeof events === 'string') {
-      return this.nativeEvents.addListener(events, cb);
+      return this.nativeEvents.addListener(events, <Function>cb);
     }
     return Object.keys(events).map(event => this.nativeEvents.addListener(event, events[event]));
   }
 
-  unlistenNative(events, cb) {
+  unlistenNative(events : string | { [s : string] : Function }, cb? : Function) {
     if (typeof events === 'string') {
-      return this.nativeEvents.removeListener(events, cb);
+      return this.nativeEvents.removeListener(events, <Function>cb);
     }
     return Object.keys(events).map(event => this.nativeEvents.removeListener(event, events[event]));
   }
 }
 
-export default class WsProtocolApi extends ApiBase {
-  constructor(url = '', EventEmitter, options = {}) {
-    let wsPeer = new WebsocketApi(url, EventEmitter);
-    super(wsPeer, {});
+interface LastReconnect extends PromiseInfo {
+  time: number;
+  count: number;
+}
+
+export type WaitResPromises = { [n: number]: any; };
+
+export type RequestOptions = {
+  timeout? : number;
+  cancelToken? : ICancelToken;
+};
+
+export type WsProtocolApiOptions = {
+  reconnection: boolean;
+  reconnectionDelay: number;
+  reconnectionAttempts: number;
+};
+
+export default class WsProtocolApi extends ApiBase<WebsocketApi> {
+  EventEmitter : IEventEmitterClass;
+  options : WsProtocolApiOptions;
+  events : IEventEmitter;
+  lastReconnect : LastReconnect | null;
+  waitResPromises : WaitResPromises;
+  wsMsgCounter: number;
+
+  constructor(url = '', EventEmitter : IEventEmitterClass, options : Object = {}) {
+    super(new WebsocketApi(url, EventEmitter), {});
     this.EventEmitter = EventEmitter;
     this.options = Object.assign({
       reconnection: true,
@@ -116,6 +177,9 @@ export default class WsProtocolApi extends ApiBase {
     this.events = new EventEmitter();
     this.waitResPromises = {};
     this.wsMsgCounter = new Date().getTime();
+
+    const x = this.wsPeer;
+
     this.wsPeer.listenNative({
       message: this.wsOnMessage,
       error: () => {},
@@ -123,38 +187,40 @@ export default class WsProtocolApi extends ApiBase {
     });
   }
 
-  get nativeEvents(){
+  get nativeEvents() {
     return this.wsPeer.nativeEvents;
   }
 
-  stopReconnect(){
-    if(this.lastReconnect){
-      if(this.lastReconnect.reject){
-        this.lastReconnect.reject();
+  stopReconnect(reason : any) {
+    if (this.lastReconnect) {
+      if (this.lastReconnect.reject) {
+        this.lastReconnect.reject(reason);
       }
       this.lastReconnect = null;
     }
   }
 
-  reconnect(url){
-    if(this.lastReconnect && this.lastReconnect.promise){
+  reconnect(url : string) : Promise<any> {
+    if (this.lastReconnect && this.lastReconnect.promise) {
       return this.lastReconnect.promise;
     }
 
     this.lastReconnect = this.lastReconnect || {
       time: new Date().getTime(),
       count: 0,
-      reject: null,
+      promise: null,
     };
 
     this.lastReconnect.time = new Date().getTime();
     this.lastReconnect.count++;
-    this.lastReconnect.reject = null;
+    const p : Promise<any> = this.lastReconnect.promise = (
+      this.lastReconnect.promise || Promise.resolve()
+    );
+    delete this.lastReconnect;
 
     // console.log('this.lastReconnect.time :', this.lastReconnect.time);
 
-    return this.lastReconnect.promise = (this.lastReconnect.promise || Promise.resolve())
-    .then(() => {
+    return p.then(() => {
       return this._open(url);
     })
     .then(() => {
@@ -162,29 +228,29 @@ export default class WsProtocolApi extends ApiBase {
     })
     .catch(() => {
       return new Promise((resolve, _reject) => {
-        if(!this.lastReconnect){
+        if (!this.lastReconnect) {
           const message = 'Reconnection interrupted';
           this.events.emit('disconnect', {
-            reason: message,
             message,
+            reason: message,
           });
           return _reject();
         }
 
-        if(this.lastReconnect.count > this.options.reconnectionAttempts){
+        if (this.lastReconnect.count > this.options.reconnectionAttempts) {
           const message = 'Reconnection limit exceeded';
           this.events.emit('disconnect', {
-            reason: message,
             message,
+            reason: message,
           });
           return _reject();
         }
 
-        let timeout = null;
-        let reject = () => {
+        let timeout : number = 0;
+        const reject = () => {
           clearTimeout(timeout);
           _reject();
-        }
+        };
         timeout = setTimeout(resolve, this.options.reconnectionDelay);
         this.lastReconnect.reject = reject;
       })
@@ -195,11 +261,11 @@ export default class WsProtocolApi extends ApiBase {
     });
   }
 
-  open(url) {
+  open(url : string) : Promise<any> {
     return this.reconnect(url);
   }
 
-  _open(url) {
+  _open(url : string) : Promise<any> {
     return this.wsPeer.open(url).then(() => this);
   }
 
@@ -213,17 +279,17 @@ export default class WsProtocolApi extends ApiBase {
     .then(() => {
       this.events.emit('disconnect', evt);
     })
-    .catch((e) => {
+    .catch((e : Error) => {
       this.events.emit('disconnect', evt);
       throw e;
     });
   }
 
-  request(msgConfig, options) {
+  request(msgConfig : WsMessageConfig, options : RequestOptions = {}) {
     return this.sendAndWaitResponse(msgConfig, options);
   }
 
-  sendAndWaitResponse(msgConfig, {timeout = 30000, cancelToken} = {}) {
+  sendAndWaitResponse(msgConfig : WsMessageConfig, { timeout = 30000, cancelToken } : RequestOptions = {}) {
     const msgId = ++this.wsMsgCounter;
     const config = Object.assign({}, msgConfig, { msgId });
     const msg = new AzWsMessage(config);
@@ -240,19 +306,19 @@ export default class WsProtocolApi extends ApiBase {
     return cancelable.promise;
   }
 
-  wsOnMessage = ({ data: rawData }, ws) => {
+  wsOnMessage = ({ data: rawData } : { data: RawData }, ws : any) => {
     const wsMsg = new AzWsMessage({ rawData });
-    wsMsg.body.json().then((data) => {
+    (<AzWsMsgBody>wsMsg.body).json().then((data) => {
       const evt = { rawData, wsMsg, data };
       this.events.emit('message', evt);
       if (wsMsg.method === 'RESPONSE' && (wsMsg.msgId in this.waitResPromises)) {
         this.events.emit('response', evt);
-        if(!evt.wsMsg.status || evt.wsMsg.status < 200 || evt.wsMsg.status >= 400){
-          let error = {
+        if (!evt.wsMsg.status || evt.wsMsg.status < 200 || evt.wsMsg.status >= 400) {
+          const error = {
             response: evt,
           };
           this.waitResPromises[wsMsg.msgId].reject(error);
-        }else{
+        }else {
           this.waitResPromises[wsMsg.msgId].resolve(evt);
         }
         delete this.waitResPromises[wsMsg.msgId];
@@ -260,5 +326,5 @@ export default class WsProtocolApi extends ApiBase {
         this.events.emit('send', evt);
       }
     });
-  };
+  }
 }

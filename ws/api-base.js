@@ -1,39 +1,49 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
+exports["default"] = void 0;
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _ws = require('../ws');
+var _index = require("../ws/index");
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var ApiBase = function () {
   function ApiBase(wsPeer, wsPeerManager) {
     _classCallCheck(this, ApiBase);
+
+    _defineProperty(this, "wsPeer", void 0);
+
+    _defineProperty(this, "wsPeerManager", void 0);
 
     this.wsPeer = wsPeer;
     this.wsPeerManager = wsPeerManager;
   }
 
   _createClass(ApiBase, [{
-    key: 'open',
+    key: "open",
     value: function open(url) {
-      return Promise.reject('Not implemented');
+      return Promise.reject(new Error('Not implemented'));
     }
   }, {
-    key: 'close',
+    key: "close",
     value: function close(code, reason) {
-      return Promise.reject('Not implemented');
+      return Promise.reject(new Error('Not implemented'));
     }
   }, {
-    key: 'send',
+    key: "send",
     value: function send(msgConfig) {
-      var config = Object.assign({}, msgConfig, { method: 'SEND' });
-      var msg = new _ws.AzWsMessage(config);
+      var config = Object.assign({}, msgConfig, {
+        method: 'SEND'
+      });
+      var msg = new _index.AzWsMessage(config);
       return this.wsPeer.send(msg.build());
     }
   }]);
@@ -41,4 +51,4 @@ var ApiBase = function () {
   return ApiBase;
 }();
 
-exports.default = ApiBase;
+exports["default"] = ApiBase;

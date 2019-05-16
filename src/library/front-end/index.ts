@@ -5,7 +5,7 @@ export {
   AzWsMsgBody,
   AzWsResponse,
   AzWsMessage,
-} from '../ws';
+} from '../ws/index';
 
 export {
   WsProtocol,

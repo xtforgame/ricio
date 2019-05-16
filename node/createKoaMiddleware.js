@@ -1,39 +1,37 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = void 0;
 
-var _ws = require('../ws');
+var _axios = _interopRequireDefault(require("axios"));
 
-var _RicioPeer = require('../RicioPeer');
+var _RicioPeer = _interopRequireDefault(require("../RicioPeer"));
 
-var _RicioPeer2 = _interopRequireDefault(_RicioPeer);
-
-var _axios = require('axios');
-
-var _axios2 = _interopRequireDefault(_axios);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function createContext(ctx, rcPeer) {
   ctx.rcPeer = rcPeer;
   ctx.rcResponse = {
-    send: function send(msg) {
-      ctx.body = msg;
+    send: function send(body) {
+      ctx.body = body;
     },
-    throw: function _throw(statusCode, message, optioins) {
-      ctx.throw(statusCode, message, optioins);
+    sendPromise: function sendPromise(body) {
+      ctx.body = body;
+      return Promise.resolve();
+    },
+    "throw": function _throw(status, message, optioins) {
+      ctx["throw"](status, message, optioins);
     }
   };
   return ctx;
 }
 
-exports.default = function (userSessionManager) {
-  var PeerClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _RicioPeer2.default;
+var _default = function _default(userSessionManager) {
+  var PeerClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _RicioPeer["default"];
   return function (ctx, next) {
     var webhookUrl = ctx.request.headers['x-ricio-webhook-url'];
-
     var rcPeer = new PeerClass(userSessionManager, {
       protocol: {
         type: 'http',
@@ -42,7 +40,8 @@ exports.default = function (userSessionManager) {
             if (!webhookUrl) {
               return Promise.reject(new Error('No "x-ricio-webhook-url" header provided'));
             }
-            return (0, _axios2.default)({
+
+            return (0, _axios["default"])({
               method: 'post',
               url: webhookUrl,
               data: msg.body
@@ -53,9 +52,9 @@ exports.default = function (userSessionManager) {
         }
       }
     });
-
     createContext(ctx, rcPeer);
-
     return next();
   };
 };
+
+exports["default"] = _default;
