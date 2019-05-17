@@ -3,7 +3,6 @@ import { RawData } from '../ws';
 import RicioPeer, { IRcPeer, IRcPeerClass, IRcPeerManager } from '../RicioPeer';
 import { EmptyWsPeerManager, IWsPeer, IWsPeerManager } from '~/WsPeer';
 import WsProtocolApi, { AzWsMessageCtx, IServerWsPeer } from '../ws/server/api';
-import { ICtx } from '../Ctx';
 
 function createContext<RcPeer>(
   server : any,
@@ -15,7 +14,7 @@ function createContext<RcPeer>(
     rawData = null,
     ...options
   }: { method: string, rawData?: RawData, peerInfo?: Object }
-) : ICtx<RcPeer> {
+) : AzWsMessageCtx<RcPeer> {
   const peerInfo = {
     ..._peerInfo,
     server,
@@ -52,11 +51,11 @@ export interface WsServerOptions<WsPeer extends IWsPeer = ws, WsPeerManager exte
 }
 
 export default class WsServer<WsPeer extends IWsPeer = ws, WsPeerManager extends IWsPeerManager<WsPeer> = EmptyWsPeerManager<WsPeer>, RcPeer = RicioPeer<WsPeer, WsPeerManager>> {
-  callback: (ctx? : ICtx<RcPeer>) => any;
+  callback: (ctx? : AzWsMessageCtx<RcPeer>) => any;
   server : IServer;
 
   constructor(
-    callback: (ctx? : ICtx<RcPeer>) => any,
+    callback: (ctx? : AzWsMessageCtx<RcPeer>) => any,
     options : WsServerOptions<WsPeer, WsPeerManager>,
     ...args : any[]
   ) {
@@ -77,8 +76,8 @@ export default class WsServer<WsPeer extends IWsPeer = ws, WsPeerManager extends
       rcPeerManager : IRcPeerManager<WsPeer, WsPeerManager>;
       PeerClass : IRcPeerClass;
     },
-    onError = ((ctx : ICtx<RcPeer>) => {}),
-    onNoMatch = ((ctx : ICtx<RcPeer>) => {})
+    onError = ((ctx : AzWsMessageCtx<RcPeer>) => {}),
+    onNoMatch = ((ctx : AzWsMessageCtx<RcPeer>) => {})
   ) {
     this.on('connection', (wsObj : IServerWsPeer) => {
       const rcPeer = <RcPeer>new PeerClass<WsPeer, WsPeerManager>(rcPeerManager, {

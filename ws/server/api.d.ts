@@ -1,8 +1,9 @@
 import ws from 'ws';
 import { AzWsMessage, WsMessageConfig, Status } from '../../ws/index';
 import WsProtocolApiBase from '../api-base';
-import { IWsPeer } from '../../WsPeer';
-export declare class AzWsMessageCtx<RcPeer> extends AzWsMessage {
+import { IWsPeer } from '~/WsPeer';
+import { ICtx } from '~/Ctx';
+export declare class AzWsMessageCtx<RcPeer> extends AzWsMessage implements ICtx<RcPeer> {
     rcPeer: RcPeer;
     rcResponse: any;
     request: any;

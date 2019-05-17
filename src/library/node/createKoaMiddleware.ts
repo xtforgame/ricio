@@ -2,10 +2,10 @@ import ws from 'ws';
 import axios from 'axios';
 import RicioPeer, { IRcPeerManager } from '../RicioPeer';
 import { EmptyWsPeerManager, IWsPeer, IWsPeerManager } from '~/WsPeer';
-import { ICtx } from '../Ctx';
 import { Body, Status, LightMsg, WsMessage } from '../ws/index';
+import { AzWsMessageCtx } from '~/ws/server/api';
 
-function createContext<RcPeer>(ctx : ICtx<RcPeer>, rcPeer : RcPeer) {
+function createContext<RcPeer>(ctx : AzWsMessageCtx<RcPeer>, rcPeer : RcPeer) {
   ctx.rcPeer = rcPeer;
   ctx.rcResponse = {
     send: (body : Body) => {
@@ -30,7 +30,7 @@ export default <
   rcPeerManager : IRcPeerManager<WsPeer, WsPeerManager>,
   PeerClass = RicioPeer,
 ) => (
-  ctx : ICtx<RcPeer>, next : () => Promise<any>,
+  ctx : AzWsMessageCtx<RcPeer>, next : () => Promise<any>,
 ) => {
   const {
     'x-ricio-webhook-url': webhookUrl,
