@@ -1,5 +1,13 @@
-// // [TODO] remove this line
-// process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+import ws from 'ws';
+import { WsMessageConfig } from './ws/index';
+import { IWsProtocolApi } from './ws/api-base';
+import { IWsPeer } from './WsPeer';
+
+export interface IWsProtocol<WsPeer extends IWsPeer, WsPeerManager = any> {
+  type: string;
+  api: IWsProtocolApi<WsPeer, WsPeerManager>;
+}
+
 export interface IRicioPeer {
 }
 
@@ -11,9 +19,9 @@ export interface IUserSessionManager {
   allPeers: any;
 }
 
-export default class RicioPeer {
-  protocol : any;
-  api : any;
+export default class RicioPeer<WsPeer extends IWsPeer = ws, WsPeerManager = any> {
+  protocol : IWsProtocol<WsPeer, WsPeerManager>;
+  api : IWsProtocolApi<WsPeer, WsPeerManager>;
   userSessionManager : IUserSessionManager;
 
   session : any;
@@ -29,7 +37,7 @@ export default class RicioPeer {
     this.userSessionManager = userSessionManager;
   }
 
-  send = (msg : any) => this.protocol.api.send(msg)
+  send = (msg : WsMessageConfig) => this.api.send(msg)
   .catch((e : Error) => {
     console.log('RicioPeer Send Error :', e);
   });

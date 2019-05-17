@@ -2,7 +2,18 @@ import { AzWsMessage, WsMessageConfig, Url } from '../ws/index';
 import { IRicioPeer } from '../RicioPeer';
 import { IWsPeer } from '../WsPeer';
 
-export default class ApiBase<WsPeer extends IWsPeer, WsPeerManager = any> {
+export interface IWsProtocolApi<WsPeer extends IWsPeer, WsPeerManager = any> {
+  wsPeer : WsPeer;
+  wsPeerManager : WsPeerManager;
+
+  open(url : string) : Promise<any>;
+
+  close(code? : number, reason? : string) : Promise<any>;
+
+  send(msgConfig : WsMessageConfig) : any;
+}
+
+export default class WsProtocolApiBase<WsPeer extends IWsPeer, WsPeerManager = any> implements IWsProtocolApi<WsPeer, WsPeerManager> {
   wsPeer : WsPeer;
   wsPeerManager : WsPeerManager;
 

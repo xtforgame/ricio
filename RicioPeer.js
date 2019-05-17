@@ -32,7 +32,7 @@ var RicioPeer = function () {
     _defineProperty(this, "managedSession", void 0);
 
     _defineProperty(this, "send", function (msg) {
-      return _this.protocol.api.send(msg)["catch"](function (e) {
+      return _this.api.send(msg)["catch"](function (e) {
         console.log('RicioPeer Send Error :', e);
       });
     });

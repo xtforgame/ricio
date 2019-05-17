@@ -15,9 +15,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var ApiBase = function () {
-  function ApiBase(wsPeer, wsPeerManager) {
-    _classCallCheck(this, ApiBase);
+var WsProtocolApiBase = function () {
+  function WsProtocolApiBase(wsPeer, wsPeerManager) {
+    _classCallCheck(this, WsProtocolApiBase);
 
     _defineProperty(this, "wsPeer", void 0);
 
@@ -27,7 +27,7 @@ var ApiBase = function () {
     this.wsPeerManager = wsPeerManager;
   }
 
-  _createClass(ApiBase, [{
+  _createClass(WsProtocolApiBase, [{
     key: "open",
     value: function open(url) {
       return Promise.reject(new Error('Not implemented'));
@@ -48,7 +48,7 @@ var ApiBase = function () {
     }
   }]);
 
-  return ApiBase;
+  return WsProtocolApiBase;
 }();
 
-exports["default"] = ApiBase;
+exports["default"] = WsProtocolApiBase;

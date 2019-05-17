@@ -57,8 +57,8 @@ var AzWsMessageCtx = function (_AzWsMessage) {
 
 exports.AzWsMessageCtx = AzWsMessageCtx;
 
-var WsProtocolApi = function (_ApiBase) {
-  _inherits(WsProtocolApi, _ApiBase);
+var WsProtocolApi = function (_WsProtocolApiBase) {
+  _inherits(WsProtocolApi, _WsProtocolApiBase);
 
   function WsProtocolApi() {
     _classCallCheck(this, WsProtocolApi);

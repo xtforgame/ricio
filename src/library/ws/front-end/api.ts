@@ -1,4 +1,4 @@
-import ApiBase from '../api-base';
+import WsProtocolApiBase from '../api-base';
 import { AzWsMessage, AzWsMsgBody, RawData, WsMessageConfig } from '../../ws/index';
 import makeCancelable, { ICancelToken } from '../../utils/makeCancelable';
 
@@ -157,7 +157,7 @@ export type WsProtocolApiOptions = {
   reconnectionAttempts: number;
 };
 
-export default class WsProtocolApi extends ApiBase<WebsocketApi> {
+export default class WsProtocolApi extends WsProtocolApiBase<WebsocketApi> {
   EventEmitter : IEventEmitterClass;
   options : WsProtocolApiOptions;
   events : IEventEmitter;
