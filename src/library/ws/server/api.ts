@@ -1,8 +1,8 @@
 import ws from 'ws';
 import { AzWsMessage, WsMessageConfig, Status, LightMsg } from '../../ws/index';
 import WsProtocolApiBase from '../api-base';
-import { IWsPeer } from '~/WsPeer';
-import { ICtx } from '~/Ctx';
+import { IWsPeer } from '../../WsPeer';
+import { ICtx } from '../../Ctx';
 
 export class AzWsMessageCtx<RcPeer> extends AzWsMessage implements ICtx<RcPeer> {
   rcPeer : RcPeer;

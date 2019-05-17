@@ -1,9 +1,9 @@
 import ws from 'ws';
 import axios from 'axios';
 import RicioPeer, { IRcPeerManager } from '../RicioPeer';
-import { EmptyWsPeerManager, IWsPeer, IWsPeerManager } from '~/WsPeer';
+import { EmptyWsPeerManager, IWsPeer, IWsPeerManager } from '../WsPeer';
 import { Body, Status, LightMsg, WsMessage } from '../ws/index';
-import { AzWsMessageCtx } from '~/ws/server/api';
+import { AzWsMessageCtx } from '../ws/server/api';
 
 function createContext<RcPeer>(ctx : AzWsMessageCtx<RcPeer>, rcPeer : RcPeer) {
   ctx.rcPeer = rcPeer;

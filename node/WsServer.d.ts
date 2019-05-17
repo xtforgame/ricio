@@ -1,6 +1,6 @@
 import ws, { IServer } from 'ws';
 import RicioPeer, { IRcPeerClass, IRcPeerManager } from '../RicioPeer';
-import { EmptyWsPeerManager, IWsPeer, IWsPeerManager } from '~/WsPeer';
+import { EmptyWsPeerManager, IWsPeer, IWsPeerManager } from '../WsPeer';
 import { AzWsMessageCtx } from '../ws/server/api';
 export interface WsServerOptions<WsPeer extends IWsPeer = ws, WsPeerManager extends IWsPeerManager<WsPeer> = EmptyWsPeerManager<WsPeer>> {
     rcPeerManager: IRcPeerManager<WsPeer, WsPeerManager>;

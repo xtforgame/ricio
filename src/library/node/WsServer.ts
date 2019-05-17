@@ -1,7 +1,7 @@
 import ws, { Server, IServer } from 'ws';
 import { RawData } from '../ws';
 import RicioPeer, { IRcPeer, IRcPeerClass, IRcPeerManager } from '../RicioPeer';
-import { EmptyWsPeerManager, IWsPeer, IWsPeerManager } from '~/WsPeer';
+import { EmptyWsPeerManager, IWsPeer, IWsPeerManager } from '../WsPeer';
 import WsProtocolApi, { AzWsMessageCtx, IServerWsPeer } from '../ws/server/api';
 
 function createContext<RcPeer>(
