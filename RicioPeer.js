@@ -14,7 +14,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var RicioPeer = function () {
-  function RicioPeer(userSessionManager, option) {
+  function RicioPeer(rcPeerManager, option) {
     var _this = this;
 
     _classCallCheck(this, RicioPeer);
@@ -23,7 +23,7 @@ var RicioPeer = function () {
 
     _defineProperty(this, "api", void 0);
 
-    _defineProperty(this, "userSessionManager", void 0);
+    _defineProperty(this, "rcPeerManager", void 0);
 
     _defineProperty(this, "session", void 0);
 
@@ -43,7 +43,7 @@ var RicioPeer = function () {
 
     this.protocol = option.protocol;
     this.api = option.protocol.api;
-    this.userSessionManager = userSessionManager;
+    this.rcPeerManager = rcPeerManager;
   }
 
   _createClass(RicioPeer, [{

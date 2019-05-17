@@ -34,7 +34,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var AzWsMessageCtx = function (_AzWsMessage) {
   _inherits(AzWsMessageCtx, _AzWsMessage);
 
-  function AzWsMessageCtx(config) {
+  function AzWsMessageCtx(config, rcPeer) {
     var _this;
 
     _classCallCheck(this, AzWsMessageCtx);
@@ -49,6 +49,7 @@ var AzWsMessageCtx = function (_AzWsMessage) {
 
     _defineProperty(_assertThisInitialized(_this), "throw", function (status, message, optioins) {});
 
+    _this.rcPeer = rcPeer;
     return _this;
   }
 

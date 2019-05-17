@@ -1,5 +1,5 @@
 import { AzWsMessage, WsMessageConfig, Url } from '../ws/index';
-import { IRicioPeer } from '../RicioPeer';
+import { IRcPeer } from '../RicioPeer';
 import { IWsPeer } from '../WsPeer';
 
 export interface IWsProtocolApi<WsPeer extends IWsPeer, WsPeerManager = any> {

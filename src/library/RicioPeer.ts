@@ -8,16 +8,23 @@ export interface IWsProtocol<WsPeer extends IWsPeer = ws, WsPeerManager extends 
   api: IWsProtocolApi<WsPeer, WsPeerManager>;
 }
 
-export interface IRicioPeer {
+export interface IRcPeer<WsPeer, WsPeerManager> {
 }
 
-export interface IRicioPeerClass {
-  new (...args : any[]): IRicioPeer;
+export interface IRcPeerClass {
+  new <WsPeer, WsPeerManager>(...args : any[]): IRcPeer<WsPeer, WsPeerManager>;
 }
 
 export interface IRcPeerManager<WsPeer extends IWsPeer = ws, WsPeerManager extends IWsPeerManager<WsPeer> = EmptyWsPeerManager<WsPeer>> {
   wsPeerManager: WsPeerManager;
 }
+
+// export class EmptyRcPeerManager<WsPeer extends IWsPeer = ws, WsPeerManager extends IWsPeerManager<WsPeer> = EmptyWsPeerManager<WsPeer>> {
+//   wsPeerManager : WsPeerManager;
+//   constructor() {
+//     this.wsPeerManager = new EmptyWsPeerManager<WsPeer>();
+//   }
+// }
 
 export default class RicioPeer<WsPeer extends IWsPeer = ws, WsPeerManager extends IWsPeerManager<WsPeer> = EmptyWsPeerManager<WsPeer>> {
   protocol : IWsProtocol<WsPeer, WsPeerManager>;

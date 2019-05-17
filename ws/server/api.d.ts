@@ -2,13 +2,11 @@ import ws from 'ws';
 import { AzWsMessage, WsMessageConfig, Status } from '../../ws/index';
 import WsProtocolApiBase from '../api-base';
 import { IWsPeer } from '../../WsPeer';
-import RicioPeer, { IRicioPeer } from '../../RicioPeer';
-import { RcPeer } from '../../Ctx';
-export declare class AzWsMessageCtx<PeerClass extends IRicioPeer = RicioPeer> extends AzWsMessage {
+export declare class AzWsMessageCtx<RcPeer> extends AzWsMessage {
     rcPeer: RcPeer;
     rcResponse: any;
     request: any;
-    constructor(config: WsMessageConfig);
+    constructor(config: WsMessageConfig, rcPeer: RcPeer);
     throw: (status: Status, message: string | null, optioins: Object) => void;
 }
 export interface IServerWsPeer extends IWsPeer {

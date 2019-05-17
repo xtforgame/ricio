@@ -1,9 +1,11 @@
+import ws from 'ws';
 import axios from 'axios';
-import { AzWsMessage, Body, Status, LightMsg, WsMessage } from '../ws/index';
-import RicioPeer, { IRicioPeer, IRcPeerManager } from '../RicioPeer';
+import RicioPeer, { IRcPeerManager } from '../RicioPeer';
+import { EmptyWsPeerManager, IWsPeer, IWsPeerManager } from '~/WsPeer';
 import { ICtx } from '../Ctx';
+import { Body, Status, LightMsg, WsMessage } from '../ws/index';
 
-function createContext(ctx : ICtx, rcPeer : IRicioPeer) {
+function createContext<RcPeer>(ctx : ICtx<RcPeer>, rcPeer : RcPeer) {
   ctx.rcPeer = rcPeer;
   ctx.rcResponse = {
     send: (body : Body) => {
@@ -20,30 +22,42 @@ function createContext(ctx : ICtx, rcPeer : IRicioPeer) {
   return ctx;
 }
 
-export default (rcPeerManager : IRcPeerManager, PeerClass = RicioPeer) => (ctx : ICtx, next : () => Promise<any>) => {
+export default <
+  WsPeer extends IWsPeer = ws,
+  WsPeerManager extends IWsPeerManager<WsPeer> = EmptyWsPeerManager<WsPeer>,
+  RcPeer = RicioPeer<WsPeer, WsPeerManager>
+>(
+  rcPeerManager : IRcPeerManager<WsPeer, WsPeerManager>,
+  PeerClass = RicioPeer,
+) => (
+  ctx : ICtx<RcPeer>, next : () => Promise<any>,
+) => {
   const {
     'x-ricio-webhook-url': webhookUrl,
   } = ctx.request.headers;
-  const rcPeer = new PeerClass(rcPeerManager, {
-    protocol: {
-      type: 'http',
-      api: {
-        send: (msg : WsMessage) => {
-          if (!webhookUrl) {
-            return Promise.reject(new Error('No "x-ricio-webhook-url" header provided'));
-          }
-          return axios({
-            method: 'post',
-            url: webhookUrl,
-            data: msg.body,
-          })
-          .then((res : any) => res.data);
+  const rcPeer = <RcPeer><any>new PeerClass<WsPeer, WsPeerManager>(
+    rcPeerManager,
+    {
+      protocol: {
+        type: 'http',
+        api: {
+          send: (msg : WsMessage) => {
+            if (!webhookUrl) {
+              return Promise.reject(new Error('No "x-ricio-webhook-url" header provided'));
+            }
+            return axios({
+              method: 'post',
+              url: webhookUrl,
+              data: msg.body,
+            })
+            .then((res : any) => res.data);
+          },
         },
       },
-    },
-  });
+    }
+  );
 
-  createContext(ctx, rcPeer);
+  createContext<RcPeer>(ctx, rcPeer);
 
   return next();
 };
