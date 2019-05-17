@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { AzWsMessage, Body, Status, LightMsg, WsMessage } from '../ws/index';
-import RicioPeer, { IRicioPeer, IUserSessionManager } from '../RicioPeer';
+import RicioPeer, { IRicioPeer, IRcPeerManager } from '../RicioPeer';
 import { ICtx } from '../Ctx';
 
 function createContext(ctx : ICtx, rcPeer : IRicioPeer) {
@@ -20,11 +20,11 @@ function createContext(ctx : ICtx, rcPeer : IRicioPeer) {
   return ctx;
 }
 
-export default (userSessionManager : IUserSessionManager, PeerClass = RicioPeer) => (ctx : ICtx, next : () => Promise<any>) => {
+export default (rcPeerManager : IRcPeerManager, PeerClass = RicioPeer) => (ctx : ICtx, next : () => Promise<any>) => {
   const {
     'x-ricio-webhook-url': webhookUrl,
   } = ctx.request.headers;
-  const rcPeer = new PeerClass(userSessionManager, {
+  const rcPeer = new PeerClass(rcPeerManager, {
     protocol: {
       type: 'http',
       api: {
