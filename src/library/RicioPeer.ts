@@ -31,10 +31,6 @@ export default class RicioPeer<WsPeer extends IWsPeer = ws, WsPeerManager extend
   api : IWsProtocolApi<WsPeer, WsPeerManager>;
   rcPeerManager : IRcPeerManager<WsPeer, WsPeerManager>;
 
-  session : any;
-  sessionId : any;
-  managedSession : any;
-
   constructor(rcPeerManager : IRcPeerManager<WsPeer, WsPeerManager>, option : any) {
     if (!option.protocol) {
       throw new Error('<RicioPeer>: No option.protocol provided.');
@@ -51,23 +47,5 @@ export default class RicioPeer<WsPeer extends IWsPeer = ws, WsPeerManager extend
 
   getWsPeer() {
     return this.api.wsPeer;
-  }
-
-  getSession() {
-    return this.session;
-  }
-
-  getSessionId() {
-    return this.sessionId;
-  }
-
-  setSession(managedSession : any) {
-    this.managedSession = managedSession;
-    this.sessionId = managedSession.uid;
-    this.session = managedSession.data.session;
-  }
-
-  getUser() {
-    return this.managedSession && this.managedSession.user;
   }
 }
