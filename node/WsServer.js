@@ -53,11 +53,11 @@ function createContext(server, ws, rcPeer, _ref) {
 
   var msg = new _api.AzWsMessageCtx(_objectSpread({
     path: rawData ? undefined : '/',
-    rawData: rawData
+    rawData: rawData,
+    method: method
   }, options, {
     peerInfo: peerInfo
-  }));
-  msg.rcPeer = rcPeer;
+  }), rcPeer);
 
   var send = function send(data) {
     return new Promise(function (resolve, reject) {
@@ -81,14 +81,7 @@ function createContext(server, ws, rcPeer, _ref) {
 }
 
 var WsServer = function () {
-  function WsServer(callback) {
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
-      userSessionManager: {
-        allPeers: null
-      },
-      PeerClass: _RicioPeer["default"]
-    };
-
+  function WsServer(callback, options) {
     _classCallCheck(this, WsServer);
 
     _defineProperty(this, "callback", void 0);
@@ -115,16 +108,16 @@ var WsServer = function () {
     value: function bind(_ref2) {
       var _this = this;
 
-      var userSessionManager = _ref2.userSessionManager,
+      var rcPeerManager = _ref2.rcPeerManager,
           _ref2$PeerClass = _ref2.PeerClass,
           PeerClass = _ref2$PeerClass === void 0 ? _RicioPeer["default"] : _ref2$PeerClass;
       var onError = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function (ctx) {};
       var onNoMatch = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function (ctx) {};
       this.on('connection', function (wsObj) {
-        var rcPeer = new PeerClass(userSessionManager, {
+        var rcPeer = new PeerClass(rcPeerManager, {
           protocol: {
             type: 'ws',
-            api: new _api["default"](wsObj, userSessionManager.allPeers)
+            api: new _api["default"](wsObj, rcPeerManager.wsPeerManager)
           }
         });
         wsObj.on('open', function () {

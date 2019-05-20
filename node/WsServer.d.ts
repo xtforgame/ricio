@@ -1,17 +1,18 @@
-import { IServer } from 'ws';
-import { IRicioPeerClass, IUserSessionManager } from '../RicioPeer';
-import { ICtx } from '../Ctx';
-export interface WsServerOntions {
-    userSessionManager: IUserSessionManager;
-    PeerClass: IRicioPeerClass;
+import ws, { IServer } from 'ws';
+import RicioPeer, { IRcPeerClass, IRcPeerManager } from '../RicioPeer';
+import { EmptyWsPeerManager, IWsPeer, IWsPeerManager } from '../WsPeer';
+import { AzWsMessageCtx } from '../ws/server/api';
+export interface WsServerOptions<WsPeer extends IWsPeer = ws, WsPeerManager extends IWsPeerManager<WsPeer> = EmptyWsPeerManager<WsPeer>> {
+    rcPeerManager: IRcPeerManager<WsPeer, WsPeerManager>;
+    PeerClass: IRcPeerClass;
 }
-export default class WsServer {
-    callback: (ctx?: ICtx) => any;
+export default class WsServer<WsPeer extends IWsPeer = ws, WsPeerManager extends IWsPeerManager<WsPeer> = EmptyWsPeerManager<WsPeer>, RcPeer = RicioPeer<WsPeer, WsPeerManager>> {
+    callback: (ctx?: AzWsMessageCtx<RcPeer>) => any;
     server: IServer;
-    constructor(callback: (ctx?: ICtx) => any, options?: WsServerOntions, ...args: any[]);
+    constructor(callback: (ctx?: AzWsMessageCtx<RcPeer>) => any, options: WsServerOptions<WsPeer, WsPeerManager>, ...args: any[]);
     on(eventName: string, cb: Function): any;
-    bind({ userSessionManager, PeerClass, }: {
-        userSessionManager: IUserSessionManager;
-        PeerClass: IRicioPeerClass;
-    }, onError?: (ctx: ICtx) => void, onNoMatch?: (ctx: ICtx) => void): void;
+    bind({ rcPeerManager, PeerClass, }: {
+        rcPeerManager: IRcPeerManager<WsPeer, WsPeerManager>;
+        PeerClass: IRcPeerClass;
+    }, onError?: (ctx: AzWsMessageCtx<RcPeer>) => void, onNoMatch?: (ctx: AzWsMessageCtx<RcPeer>) => void): void;
 }

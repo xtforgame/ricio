@@ -1,17 +1,17 @@
 import ws from 'ws';
 import { AzWsMessage, WsMessageConfig, Status, LightMsg } from '../../ws/index';
-import ApiBase from '../api-base';
+import WsProtocolApiBase from '../api-base';
 import { IWsPeer } from '../../WsPeer';
-import RicioPeer, { IRicioPeer } from '../../RicioPeer';
-import { RcPeer } from '../../Ctx';
+import { ICtx } from '../../Ctx';
 
-export class AzWsMessageCtx<PeerClass extends IRicioPeer = RicioPeer> extends AzWsMessage {
+export class AzWsMessageCtx<RcPeer> extends AzWsMessage implements ICtx<RcPeer> {
   rcPeer : RcPeer;
   rcResponse: any;
   request: any;
 
-  constructor(config : WsMessageConfig) {
+  constructor(config : WsMessageConfig, rcPeer : RcPeer) {
     super(config);
+    this.rcPeer = rcPeer;
   }
 
   throw = (status : Status, message : LightMsg, optioins : Object) => {
@@ -25,7 +25,7 @@ export interface IServerWsPeer extends IWsPeer {
   close(code? : number, reason? : string) : any;
 }
 
-class WsProtocolApi<WsPeer extends IServerWsPeer = ws> extends ApiBase<WsPeer> {
+class WsProtocolApi<WsPeer extends IServerWsPeer = ws> extends WsProtocolApiBase<WsPeer> {
   open(url : string) {
     return Promise.resolve(this);
   }

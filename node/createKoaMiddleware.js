@@ -28,11 +28,11 @@ function createContext(ctx, rcPeer) {
   return ctx;
 }
 
-var _default = function _default(userSessionManager) {
+var _default = function _default(rcPeerManager) {
   var PeerClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _RicioPeer["default"];
   return function (ctx, next) {
     var webhookUrl = ctx.request.headers['x-ricio-webhook-url'];
-    var rcPeer = new PeerClass(userSessionManager, {
+    var rcPeer = new PeerClass(rcPeerManager, {
       protocol: {
         type: 'http',
         api: {

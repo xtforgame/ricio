@@ -34,7 +34,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var AzWsMessageCtx = function (_AzWsMessage) {
   _inherits(AzWsMessageCtx, _AzWsMessage);
 
-  function AzWsMessageCtx(config) {
+  function AzWsMessageCtx(config, rcPeer) {
     var _this;
 
     _classCallCheck(this, AzWsMessageCtx);
@@ -49,6 +49,7 @@ var AzWsMessageCtx = function (_AzWsMessage) {
 
     _defineProperty(_assertThisInitialized(_this), "throw", function (status, message, optioins) {});
 
+    _this.rcPeer = rcPeer;
     return _this;
   }
 
@@ -57,8 +58,8 @@ var AzWsMessageCtx = function (_AzWsMessage) {
 
 exports.AzWsMessageCtx = AzWsMessageCtx;
 
-var WsProtocolApi = function (_ApiBase) {
-  _inherits(WsProtocolApi, _ApiBase);
+var WsProtocolApi = function (_WsProtocolApiBase) {
+  _inherits(WsProtocolApi, _WsProtocolApiBase);
 
   function WsProtocolApi() {
     _classCallCheck(this, WsProtocolApi);

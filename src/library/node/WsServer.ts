@@ -1,20 +1,20 @@
-import { Server, IServer } from 'ws';
+import ws, { Server, IServer } from 'ws';
 import { RawData } from '../ws';
-import RicioPeer, { IRicioPeer, IRicioPeerClass, IUserSessionManager } from '../RicioPeer';
+import RicioPeer, { IRcPeer, IRcPeerClass, IRcPeerManager } from '../RicioPeer';
+import { EmptyWsPeerManager, IWsPeer, IWsPeerManager } from '../WsPeer';
 import WsProtocolApi, { AzWsMessageCtx, IServerWsPeer } from '../ws/server/api';
-import { ICtx } from '../Ctx';
 
-function createContext(
+function createContext<RcPeer>(
   server : any,
   ws : IServerWsPeer,
-  rcPeer : IRicioPeer,
+  rcPeer : RcPeer,
   {
     method,
     peerInfo: _peerInfo = {},
     rawData = null,
     ...options
   }: { method: string, rawData?: RawData, peerInfo?: Object }
-) : ICtx {
+) : AzWsMessageCtx<RcPeer> {
   const peerInfo = {
     ..._peerInfo,
     server,
@@ -25,11 +25,11 @@ function createContext(
   const msg = new AzWsMessageCtx({
     path: rawData ? undefined : '/',
     rawData,
+    method,
     ...options,
     peerInfo,
-  });
+  }, rcPeer);
 
-  msg.rcPeer = rcPeer;
   const send = (data : Body) : Promise<any> => new Promise((resolve, reject) => {
     const cb = (error : Error) => {
       if (error) {
@@ -46,18 +46,18 @@ function createContext(
   return msg;
 }
 
-export interface WsServerOntions {
-  userSessionManager : IUserSessionManager;
-  PeerClass : IRicioPeerClass,
+export interface WsServerOptions<WsPeer extends IWsPeer = ws, WsPeerManager extends IWsPeerManager<WsPeer> = EmptyWsPeerManager<WsPeer>> {
+  rcPeerManager: IRcPeerManager<WsPeer, WsPeerManager>;
+  PeerClass : IRcPeerClass;
 }
 
-export default class WsServer {
-  callback: (ctx? : ICtx) => any;
+export default class WsServer<WsPeer extends IWsPeer = ws, WsPeerManager extends IWsPeerManager<WsPeer> = EmptyWsPeerManager<WsPeer>, RcPeer = RicioPeer<WsPeer, WsPeerManager>> {
+  callback: (ctx? : AzWsMessageCtx<RcPeer>) => any;
   server : IServer;
 
   constructor(
-    callback: (ctx? : ICtx) => any,
-    options : WsServerOntions = { userSessionManager: { allPeers: null }, PeerClass: RicioPeer },
+    callback: (ctx? : AzWsMessageCtx<RcPeer>) => any,
+    options : WsServerOptions<WsPeer, WsPeerManager>,
     ...args : any[]
   ) {
     this.callback = callback;
@@ -71,20 +71,20 @@ export default class WsServer {
 
   bind(
     {
-      userSessionManager,
+      rcPeerManager,
       PeerClass = RicioPeer,
     }: {
-      userSessionManager : IUserSessionManager,
-      PeerClass : IRicioPeerClass,
+      rcPeerManager : IRcPeerManager<WsPeer, WsPeerManager>;
+      PeerClass : IRcPeerClass;
     },
-    onError = ((ctx : ICtx) => {}),
-    onNoMatch = ((ctx : ICtx) => {})
+    onError = ((ctx : AzWsMessageCtx<RcPeer>) => {}),
+    onNoMatch = ((ctx : AzWsMessageCtx<RcPeer>) => {})
   ) {
     this.on('connection', (wsObj : IServerWsPeer) => {
-      const rcPeer = new PeerClass(userSessionManager, {
+      const rcPeer = <RcPeer><any>new PeerClass<WsPeer, WsPeerManager>(rcPeerManager, {
         protocol: {
           type: 'ws',
-          api: new WsProtocolApi(wsObj, userSessionManager.allPeers),
+          api: new WsProtocolApi(wsObj, rcPeerManager.wsPeerManager),
         },
       });
 

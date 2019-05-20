@@ -205,8 +205,8 @@ var WebsocketApi = function () {
 
 exports.WebsocketApi = WebsocketApi;
 
-var WsProtocolApi = function (_ApiBase) {
-  _inherits(WsProtocolApi, _ApiBase);
+var WsProtocolApi = function (_WsProtocolApiBase) {
+  _inherits(WsProtocolApi, _WsProtocolApiBase);
 
   function WsProtocolApi() {
     var _this4;
