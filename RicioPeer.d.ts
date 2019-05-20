@@ -18,14 +18,7 @@ export default class RicioPeer<WsPeer extends IWsPeer = ws, WsPeerManager extend
     protocol: IWsProtocol<WsPeer, WsPeerManager>;
     api: IWsProtocolApi<WsPeer, WsPeerManager>;
     rcPeerManager: IRcPeerManager<WsPeer, WsPeerManager>;
-    session: any;
-    sessionId: any;
-    managedSession: any;
     constructor(rcPeerManager: IRcPeerManager<WsPeer, WsPeerManager>, option: any);
     send: (msg: WsMessageConfig) => any;
     getWsPeer(): WsPeer;
-    getSession(): any;
-    getSessionId(): any;
-    setSession(managedSession: any): void;
-    getUser(): any;
 }

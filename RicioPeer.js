@@ -25,12 +25,6 @@ var RicioPeer = function () {
 
     _defineProperty(this, "rcPeerManager", void 0);
 
-    _defineProperty(this, "session", void 0);
-
-    _defineProperty(this, "sessionId", void 0);
-
-    _defineProperty(this, "managedSession", void 0);
-
     _defineProperty(this, "send", function (msg) {
       return _this.api.send(msg)["catch"](function (e) {
         console.log('RicioPeer Send Error :', e);
@@ -50,28 +44,6 @@ var RicioPeer = function () {
     key: "getWsPeer",
     value: function getWsPeer() {
       return this.api.wsPeer;
-    }
-  }, {
-    key: "getSession",
-    value: function getSession() {
-      return this.session;
-    }
-  }, {
-    key: "getSessionId",
-    value: function getSessionId() {
-      return this.sessionId;
-    }
-  }, {
-    key: "setSession",
-    value: function setSession(managedSession) {
-      this.managedSession = managedSession;
-      this.sessionId = managedSession.uid;
-      this.session = managedSession.data.session;
-    }
-  }, {
-    key: "getUser",
-    value: function getUser() {
-      return this.managedSession && this.managedSession.user;
     }
   }]);
 
