@@ -6,10 +6,12 @@ export interface IWsProtocol<WsPeer extends IWsPeer = ws, WsPeerManager extends 
     type: string;
     api: IWsProtocolApi<WsPeer, WsPeerManager>;
 }
-export interface IRcPeer<WsPeer, WsPeerManager> {
+export interface IRcPeer<WsPeer extends IWsPeer, WsPeerManager extends IWsPeerManager<WsPeer>> {
+    send(msg: WsMessageConfig): Promise<any>;
+    getWsPeer(): WsPeer;
 }
 export interface IRcPeerClass {
-    new <WsPeer, WsPeerManager>(...args: any[]): IRcPeer<WsPeer, WsPeerManager>;
+    new <WsPeer extends IWsPeer, WsPeerManager extends IWsPeerManager<WsPeer>>(...args: any[]): IRcPeer<WsPeer, WsPeerManager>;
 }
 export interface IRcPeerManager<WsPeer extends IWsPeer = ws, WsPeerManager extends IWsPeerManager<WsPeer> = EmptyWsPeerManager<WsPeer>> {
     wsPeerManager: WsPeerManager;
@@ -19,6 +21,6 @@ export default class RicioPeer<WsPeer extends IWsPeer = ws, WsPeerManager extend
     api: IWsProtocolApi<WsPeer, WsPeerManager>;
     rcPeerManager: IRcPeerManager<WsPeer, WsPeerManager>;
     constructor(rcPeerManager: IRcPeerManager<WsPeer, WsPeerManager>, option: any);
-    send: (msg: WsMessageConfig) => any;
+    send: (msg: WsMessageConfig) => Promise<any>;
     getWsPeer(): WsPeer;
 }

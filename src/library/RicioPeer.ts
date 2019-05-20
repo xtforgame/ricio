@@ -8,11 +8,13 @@ export interface IWsProtocol<WsPeer extends IWsPeer = ws, WsPeerManager extends 
   api: IWsProtocolApi<WsPeer, WsPeerManager>;
 }
 
-export interface IRcPeer<WsPeer, WsPeerManager> {
+export interface IRcPeer<WsPeer extends IWsPeer, WsPeerManager extends IWsPeerManager<WsPeer>> {
+  send(msg : WsMessageConfig) : Promise<any>;
+  getWsPeer() : WsPeer;
 }
 
 export interface IRcPeerClass {
-  new <WsPeer, WsPeerManager>(...args : any[]): IRcPeer<WsPeer, WsPeerManager>;
+  new <WsPeer extends IWsPeer, WsPeerManager extends IWsPeerManager<WsPeer>>(...args : any[]): IRcPeer<WsPeer, WsPeerManager>;
 }
 
 export interface IRcPeerManager<WsPeer extends IWsPeer = ws, WsPeerManager extends IWsPeerManager<WsPeer> = EmptyWsPeerManager<WsPeer>> {
@@ -40,12 +42,12 @@ export default class RicioPeer<WsPeer extends IWsPeer = ws, WsPeerManager extend
     this.rcPeerManager = rcPeerManager;
   }
 
-  send = (msg : WsMessageConfig) => this.api.send(msg)
+  send = (msg : WsMessageConfig) : Promise<any> => this.api.send(msg)
   .catch((e : Error) => {
     console.log('RicioPeer Send Error :', e);
   })
 
-  getWsPeer() {
+  getWsPeer() : WsPeer {
     return this.api.wsPeer;
   }
 }

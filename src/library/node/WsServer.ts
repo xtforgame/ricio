@@ -80,7 +80,7 @@ export default class WsServer<WsPeer extends IWsPeer = ws, WsPeerManager extends
     onNoMatch = ((ctx : AzWsMessageCtx<RcPeer>) => {})
   ) {
     this.on('connection', (wsObj : IServerWsPeer) => {
-      const rcPeer = <RcPeer>new PeerClass<WsPeer, WsPeerManager>(rcPeerManager, {
+      const rcPeer = <RcPeer><any>new PeerClass<WsPeer, WsPeerManager>(rcPeerManager, {
         protocol: {
           type: 'ws',
           api: new WsProtocolApi(wsObj, rcPeerManager.wsPeerManager),
