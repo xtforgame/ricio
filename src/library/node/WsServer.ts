@@ -111,6 +111,24 @@ export default class WsServer<WsPeer extends IWsPeer = ws, WsPeerManager extends
         this.callback(ctx);
       });
 
+      wsObj.on('ping', (data : RawData) => {
+        const ctx = createContext(this, wsObj, rcPeer, {
+          method: 'PING',
+          peerInfo: { data },
+        });
+
+        this.callback(ctx);
+      });
+
+      wsObj.on('pong', (data : RawData) => {
+        const ctx = createContext(this, wsObj, rcPeer, {
+          method: 'PONG',
+          peerInfo: { data },
+        });
+
+        this.callback(ctx);
+      });
+
       wsObj.on('close', (code? : number, reason? : string) => {
         const ctx = createContext(this, wsObj, rcPeer, {
           method: 'CLOSE',

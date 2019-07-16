@@ -144,6 +144,26 @@ var WsServer = function () {
 
           _this.callback(ctx);
         });
+        wsObj.on('ping', function (data) {
+          var ctx = createContext(_this, wsObj, rcPeer, {
+            method: 'PING',
+            peerInfo: {
+              data: data
+            }
+          });
+
+          _this.callback(ctx);
+        });
+        wsObj.on('pong', function (data) {
+          var ctx = createContext(_this, wsObj, rcPeer, {
+            method: 'PONG',
+            peerInfo: {
+              data: data
+            }
+          });
+
+          _this.callback(ctx);
+        });
         wsObj.on('close', function (code, reason) {
           var ctx = createContext(_this, wsObj, rcPeer, {
             method: 'CLOSE',
